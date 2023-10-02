@@ -3,9 +3,9 @@ on:
     types: [closed]
 
 jobs:
-  move-task-to-done-section-job:
+  move-task-to-section-job:
     runs-on: ubuntu-latest
-    name: Move Asana Task to "Done" Section
+    name: Move Asana Task to Section
     steps:
       - name: Get pull request data
         id: pr-data
@@ -34,7 +34,7 @@ jobs:
 
           # Use the Asana API to add the task to the specified section
           if [ -n "$ASANA_TASK_ID" ]; then
-          curl -X POST "https://app.asana.com/api/1.0/sections/${ASANA_DONE_SECTION_ID}/addTask" \
+          curl -X POST "https://app.asana.com/api/1.0/sections/${ASANA_SECTION_ID}/addTask" \
             -H "Authorization: Bearer ${{ secrets.ASANA_API_SECRET }}" \
             -H "Content-Type: application/json" \
           --data '{

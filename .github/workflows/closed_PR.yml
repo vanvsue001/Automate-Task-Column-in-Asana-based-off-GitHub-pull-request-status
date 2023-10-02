@@ -1,0 +1,50 @@
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  move-task-to-done-section-job:
+    runs-on: ubuntu-latest
+    name: Move Asana Task to "Done" Section
+    steps:
+      - name: Get pull request data
+        id: pr-data
+        run: echo "::set-output name=pr_number::${{ github.event.pull_request.number }}"
+
+      - name: Extract Asana Task ID from PR Description
+        id: extract-task-id
+        run: |
+          PR_DESCRIPTION="${{ github.event.pull_request.body }}"
+          echo "PR_DESCRIPTION: $PR_DESCRIPTION"
+          ASANA_PROJECT_ID="YOUR_PROJECT_ID" # Replace with the Asana project Gid
+          TASK_ID=$(echo "$PR_DESCRIPTION" | grep -oP "https://app.asana.com/0/${ASANA_PROJECT_ID}/\\d+")
+
+          if [ -z "$TASK_ID" ]; then
+            echo "Asana Task ID not found in PR description."
+          else
+            TASK_ID=${TASK_ID##*/}
+            echo "::set-output name=task_id::${TASK_ID}"
+          fi
+
+      - name: Add Asana Task to Section
+        id: add-task-to-section
+        run: |
+          ASANA_TASK_ID="${{ steps.extract-task-id.outputs.task_id }}"
+          ASANA_SECTION_ID="YOUR_COLUMN_ID" # Replace with the Asana column Gid
+
+          # Use the Asana API to add the task to the specified section
+          if [ -n "$ASANA_TASK_ID" ]; then
+          curl -X POST "https://app.asana.com/api/1.0/sections/${ASANA_DONE_SECTION_ID}/addTask" \
+            -H "Authorization: Bearer ${{ secrets.ASANA_API_SECRET }}" \
+            -H "Content-Type: application/json" \
+          --data '{
+            "data": {
+              "task": "'${ASANA_TASK_ID}'"
+            }
+          }'
+          else
+            echo "Skipping task addition as Asana Task ID is not found."
+          fi
+
+      - name: Check Asana Task Addition Status
+        run: echo "Status is ${{ steps.add-task-to-section.exitcode }}"

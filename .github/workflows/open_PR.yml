@@ -1,6 +1,6 @@
 on:
   pull_request:
-    types: [opened, reopened, closed]
+    types: [opened, reopened]
 
 jobs:
   move-task-to-done-section-job:

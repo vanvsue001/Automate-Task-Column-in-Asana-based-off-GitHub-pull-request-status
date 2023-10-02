@@ -4,6 +4,8 @@
 
 Do you want your tasks to automatically move to a PR column in Asana whenever a GitHub pull request is opened? How about Asana task that automtically move to a Done or Complete column when a pull request is closed? Then just complete the steps below and you'll have your asana task moving to what ever column you want based off your GitHub Pull Request Status!
 
+Uses GitHub workflows and Asana API.
+
 # Steps
 
 ## Step 1 : Create Asana Person Access Token (PAT)
